@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Map with Locations</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <style>
+    /* General layout */
+    body {
+      display: flex;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Map on the left */
+    #map {
+      width: 70%;
+      height: 100%;
+    }
+
+    /* Locations panel on the right */
+    .panel {
+      width: 30%;
+      padding: 20px;
+      background-color: #f8f9fa;
+      overflow-y: auto;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .panel h2 {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .location-item {
+      margin-bottom: 20px;
+      padding: 15px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .location-item:hover {
+      transform: translateY(-5px);
+    }
+
+    .location-item img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    .location-item h3 {
+      margin: 0;
+      font-size: 1.2em;
+    }
+
+    .location-item p {
+      margin: 0;
+      color: #555;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Locations panel -->
+    <div class="panel">
+      <h2>Locations</h2>
+      <ul id="location-list">
+        <li class="location-item" data-lat="40.7128" data-lng="-74.0060">
+          <img src="https://picsum.photos/50/50?random=1" alt="New York">
+          <div>
+            <h3>New York</h3>
+            <p>The city that never sleeps.</p>
+          </div>
+        </li>
+        <li class="location-item" data-lat="34.0522" data-lng="-118.2437">
+          <img src="https://picsum.photos/50/50?random=2" alt="Los Angeles">
+          <div>
+            <h3>Los Angeles</h3>
+            <p>The entertainment capital of the world.</p>
+          </div>
+        </li>
+        <li class="location-item" data-lat="51.5074" data-lng="-0.1278">
+          <img src="https://picsum.photos/50/50?random=3" alt="London">
+          <div>
+            <h3>London</h3>
+            <p>The historic heart of England.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Map container -->
+    <div id="map"></div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script>
+    // Initialize map
+    const map = L.map('map').setView([40.7128, -74.0060], 5); // Default to New York
+
+    // Add OpenStreetMap tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    // Locations and markers
+    const locations = [
+      { lat: 40.7128, lng: -74.0060, name: 'New York', description: 'The city that never sleeps.', img: 'https://picsum.photos/50/50?random=1' },
+      { lat: 34.0522, lng: -118.2437, name: 'Los Angeles', description: 'The entertainment capital of the world.', img: 'https://picsum.photos/50/50?random=2' },
+      { lat: 51.5074, lng: -0.1278, name: 'London', description: 'The historic heart of England.', img: 'https://picsum.photos/50/50?random=3' },
+    ];
+
+    // Add markers and popups with links
+    const markers = locations.map(location => {
+      const marker = L.marker([location.lat, location.lng]).addTo(map);
+
+      marker.on('click', function() {
+        // On click, redirect to location details page
+        window.location.href = `location.html?name=${encodeURIComponent(location.name)}`;
+      });
+
+      marker.bindPopup(`
+        <b>${location.name}</b><br>${location.description}
+        <br><img src="${location.img}" alt="${location.name}" width="50" style="border-radius: 50%;"/>
+      `);
+      return marker;
+    });
+
+    // Location list click event to update map view
+    const locationItems = document.querySelectorAll('.location-item');
+
+    locationItems.forEach(item => {
+      item.addEventListener('click', function() {
+        const lat = parseFloat(this.getAttribute('data-lat'));
+        const lng = parseFloat(this.getAttribute('data-lng'));
+
+        // Set the map view to the clicked location
+        map.setView([lat, lng], 12); // Zoom level can be adjusted here
+      });
+    });
+  </script>
+</body>
+</html>
